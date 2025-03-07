@@ -106,5 +106,7 @@ If you need to apply changes ...
 ```
 sudo systemctl stop rails-demo-puma
 git pull
+rails db:migrate
+rails assets:precompile
 sudo systemctl start rails-demo-puma
 ```
