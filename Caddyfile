@@ -1,0 +1,68 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+#
+# Unless the file starts with a global options block, the first
+# uncommented line is always the address of your site.
+#
+# To use your own domain name (with automatic HTTPS), first make
+# sure your domain's A/AAAA DNS records are properly pointed to
+# this machine's public IP, then replace ":80" below with your
+# domain name.
+
+# Refer to the Caddy docs for more information:
+# https://caddyserver.com/docs/caddyfile
+
+test.francescesplugas.com {
+	encode zstd gzip
+
+	root * /home/ubuntu/Code/fesplugas/rails-demo/public/assets
+	file_server
+
+	@notStatic {
+		not file
+	}
+
+	# Proxy all requests to the Rails app running on localhost:3000
+	reverse_proxy @notStatic {
+		to localhost:3000
+
+		lb_policy round_robin
+		lb_retries 2
+
+		health_uri /up
+		health_interval 5s
+		health_timeout 2s
+		health_status 2xx
+	}
+
+	# Handle errors
+	handle_errors {
+		@404 `{err.status_code} in [404]`
+		handle @404 {
+			root * /home/ubuntu/Code/fesplugas/rails-demo/public
+			file_server
+			rewrite * /404.html
+		}
+
+		@422 `{err.status_code} in [422]`
+		handle @404 {
+			root * /home/ubuntu/Code/fesplugas/rails-demo/public
+			file_server
+			rewrite * /422.html
+		}
+
+		@500 `{err.status_code} in [500]`
+		handle @500 {
+			root * /home/ubuntu/Code/fesplugas/rails-demo/public
+			file_server
+			rewrite * /500.html
+		}
+
+		handle {
+			respond "Server Error {err.status_code}"
+		}
+	}
+
+	header / {
+		Strict-Transport-Security "max-age=31536000"
+	}
+}
