@@ -1,7 +1,16 @@
 #!/usr/bin/env bash
 
+puts "== Stopping service =="
 sudo systemctl stop rails-demo-puma
+
+puts "== Pulling repository =="
 git pull
+
+puts "== Migrating database =="
 rails db:migrate
+
+puts "== Precompiling assets =="
 rails assets:precompile
+
+puts "== Starting service =="
 sudo systemctl start rails-demo-puma
