@@ -62,4 +62,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "psych", "5.1.2"
+gem "psych", "5.2.2"
