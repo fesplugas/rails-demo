@@ -61,3 +61,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "psych", "5.1.2"
